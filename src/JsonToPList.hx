@@ -1,3 +1,5 @@
+import haxe.macro.Compiler;
+
 private abstract Content(Array<Xml>) from Array<Xml> to Array<Xml> {
     @:from static function ofXml(x:Xml):Content
         return [x];
@@ -11,7 +13,7 @@ class JsonToPList {
         var src = sys.io.File.getContent(inFile);
         var data = haxe.Json.parse(src);
         var plist = write(data);
-        sys.io.File.saveContent(outFile, plist);
+        sys.io.File.saveContent(Compiler.getDefine("DEPLOY_DIR") + "/" + outFile, plist);
     }
 
     static function write(data:Dynamic) {

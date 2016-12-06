@@ -1,0 +1,28 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"haxe",
+				"build.hxml"
+			],
+			"env":
+			{
+				"DEPLOY_DIR": "/home/k/.config/sublime-text-3/Packages/HxSublime"
+			},
+			"file_regex": "^\\s*(.+):(\\d+): (?:lines \\d+-\\d+|character(?:s \\d+-| )(\\d+)) : (.*)$",
+			"name": "Compile plugin",
+			"working_dir": "/git/hxsublime/"
+		}
+	],
+	"folders":
+	[
+		{
+			"path": "."
+		},
+		{
+			"path": "/home/k/.config/sublime-text-3/Packages/HxSublime"
+		}
+	]
+}
