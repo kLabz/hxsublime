@@ -1,10 +1,16 @@
+import python.Bytes;
+import python.NativeStringTools;
+import python.Tuple;
+import python.lib.Shutil;
 import python.lib.os.Path;
 import python.lib.subprocess.Popen;
-import python.Tuple;
-import python.lib.Bytes;
+import python.lib.xml.etree.ElementTree;
 
-import sublime.def.Exec;
+import sublime.Region;
+import sublime.Sublime;
 import sublime.View;
+import sublime.def.Exec;
+import sublime.plugin.EventListener;
 
 import BuildHelper.Build;
 
@@ -68,7 +74,7 @@ class HaxeServer {
     }
 }
 
-class HaxeComplete extends sublime.plugin.EventListener {
+class HaxeComplete extends EventListener {
 
     public static var instance(default,null):HaxeComplete;
 
@@ -78,7 +84,7 @@ class HaxeComplete extends sublime.plugin.EventListener {
         instance = this;
     }
 
-    override function on_query_completions(view:sublime.View, prefix:String, locations:Array<Int>):Tuple2<Array<Tuple2<String,String>>, Int> {
+    override function on_query_completions(view:View, prefix:String, locations:Array<Int>):Tuple2<Array<Tuple2<String,String>>, Int> {
         var pos = locations[0];
 
         var scopeName = view.scope_name(pos);
@@ -96,7 +102,7 @@ class HaxeComplete extends sublime.plugin.EventListener {
             return null;
 
         var offset = pos - prefix.length;
-        var src = view.substr(new sublime.Region(0, view.size()));
+        var src = view.substr(new Region(0, view.size()));
 
         var prev = src.charAt(offset - 1);
         var cur = src.charAt(offset);
@@ -107,7 +113,7 @@ class HaxeComplete extends sublime.plugin.EventListener {
             default: Toplevel;
         }
 
-        var b = python.NativeStringTools.encode(src.substr(0, offset), "utf-8");
+        var b = NativeStringTools.encode(src.substr(0, offset), "utf-8");
         var bytePos = b.length;
 
         var mode = if (completionType.match(Toplevel)) "@toplevel" else "";
@@ -159,7 +165,7 @@ class HaxeComplete extends sublime.plugin.EventListener {
         restoreTempFile(view, tempFile);
 
         var xml = try {
-            python.lib.xml.etree.ElementTree.XML(result);
+            ElementTree.XML(result);
         } catch (_:Dynamic) {
             trace("No completion:\n" + result);
             return null;
@@ -198,7 +204,7 @@ class HaxeComplete extends sublime.plugin.EventListener {
                 return null;
         }
 
-        return Tuple2.make(result, sublime.Sublime.INHIBIT_WORD_COMPLETIONS);
+        return Tuple2.make(result, Sublime.INHIBIT_WORD_COMPLETIONS);
     }
 
     public function getBuild(folder:String):Build {
@@ -217,15 +223,15 @@ class HaxeComplete extends sublime.plugin.EventListener {
     public function saveTempFile(view:View):String {
         var currentFile = view.file_name();
         var tempFile = currentFile + ".tmp";
-        var content = view.substr(new sublime.Region(0, view.size()));
-        python.lib.Shutil.copy2(currentFile, tempFile);
+        var content = view.substr(new Region(0, view.size()));
+        Shutil.copy2(currentFile, tempFile);
         sys.io.File.saveContent(currentFile, content);
         return tempFile;
     }
 
     public function restoreTempFile(view:View, tempFile:String):Void {
         var currentFile = view.file_name();
-        python.lib.Shutil.copy2(tempFile, currentFile);
+        Shutil.copy2(tempFile, currentFile);
         sys.FileSystem.deleteFile(tempFile);
     }
 }

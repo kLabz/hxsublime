@@ -1,7 +1,7 @@
 package sublime.def;
 
 import python.Dict;
-import python.lib.Bytes;
+import python.Bytes;
 
 @:pythonImport("Default.exec", "AsyncProcess")
 extern class AsyncProcess {
