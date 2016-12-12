@@ -15,8 +15,8 @@ class HaxeHint extends TextCommand<Args> {
 
     override function run(edit:Edit, ?args:KwArgs<Args>) {
         var args = args.typed();
-        var pos = view.sel()[0].a + 1;
         view.run_command("insert", Lib.anonAsDict({characters: args.input}));
+        var pos = view.sel()[0].a + 1;
 
         trace("Showing hint " + args);
         trace(pos);
@@ -32,7 +32,7 @@ class HaxeHint extends TextCommand<Args> {
         }
 
         trace("Found hint: " + xml.text);
-        //view.show_popup(parseHint(view.substr(new Region(0, pos)), xml.text));
+        view.show_popup(parseHint(view.substr(new Region(0, pos)), xml.text));
     }
 
     private function parseHint(src:String, hint:String, ?pos:Int = 0):String {
@@ -85,7 +85,7 @@ class HaxeHint extends TextCommand<Args> {
         var fxReg = ~/([a-zA-Z0-9<>\s_]+)\($/;
         
         if (fxReg.match(src)) {
-            return fxReg.matched(1);
+            return fxReg.matched(1).trim();
         }
             
         return "Unknown function";
