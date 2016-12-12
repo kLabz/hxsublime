@@ -1,0 +1,13 @@
+[
+    {
+        "caption": "HxSublime: Test",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/HxSublime/HxSublime.py"
+        }
+    },
+    {
+        "caption": "HxSublime: Goto Definition",
+        "command": "haxe_goto_definition"
+    }
+]

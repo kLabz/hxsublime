@@ -86,36 +86,93 @@ class HaxeComplete extends EventListener {
 
     override function on_query_completions(view:View, prefix:String, locations:Array<Int>):Tuple2<Array<Tuple2<String,String>>, Int> {
         var pos = locations[0];
+        // trace("Prefix: " + prefix);
+        var result = getHaxeBuild(view, prefix, pos);
 
-        var scopeName = view.scope_name(pos);
-        if (scopeName.indexOf("source.haxe") != 0)
+        var xml = try {
+            ElementTree.XML(result);
+        } catch (_:Dynamic) {
+            trace("No completion:\n" + result);
             return null;
+        }
+
+        var result:Array<Tuple2<String,String>> = [];
+        var completionType = getCompletionType(view, prefix, pos);
+
+        switch (completionType) {
+            case Toplevel:
+                for (e in xml.findall("i")) {
+                    var name = e.text;
+                    var kind = e.attrib.get("k", "");
+                    var hint = switch (kind) {
+                        case "local" | "member" | "static" | "enum" | "global":
+                            SignatureHelper.prepareSignature(e.attrib.get("t", null));
+                        default:
+                            "";
+                    }
+                    result.push(Tuple2.make('$name$hint\t$kind', e.text));
+                }
+
+            case Field:
+                for (e in xml.findall("i")) {
+                    var name = e.attrib.get("n", "?");
+                    var kind:FieldCompletionKind = cast e.attrib.get("k", "");
+                    var hint = switch (kind) {
+                        case Var | Method: SignatureHelper.prepareSignature(e.find("t").text);
+                        case Type: "\ttype";
+                        case Package: "\tpackage";
+                    }
+                    result.push(Tuple2.make('$name$hint', name));
+                }
+
+            case Argument:
+                // view.show_popup(xml.text);
+                return Tuple2.make([], Sublime.INHIBIT_WORD_COMPLETIONS);
+        }
+
+        return Tuple2.make(result, Sublime.INHIBIT_WORD_COMPLETIONS);
+    }
+
+    public function getCompletionType(view:View, prefix:String, pos:Int):CompletionType {
+        var offset = pos - prefix.length;
+        var src = view.substr(new Region(0, view.size()));
+        var prev = src.charAt(offset - 1);
+        // var cur = src.charAt(offset);
+
+        return switch (prev) {
+            case ".": Field;
+            // case "(": Toplevel; //Argument;
+            case "(": Argument;
+            case ",": Argument;
+            default: Toplevel;
+        }
+    }
+
+    public function getHaxeBuild(view:View, prefix:String, pos:Int):String {
+        var scopeName = view.scope_name(pos);
+        if (scopeName.indexOf("source.haxe") != 0) {
+            return null;
+        }
 
         var scopes = scopeName.split(" ");
         for (scope in scopes) {
-            if (scope.startsWith("string") || scope.startsWith("comment"))
+            if (scope.startsWith("string") || scope.startsWith("comment")) {
                 return null;
+            }
         }
 
         var fileName = view.file_name();
-        if (fileName == null)
+        if (fileName == null) {
             return null;
+        }
 
         var offset = pos - prefix.length;
         var src = view.substr(new Region(0, view.size()));
 
-        var prev = src.charAt(offset - 1);
-        var cur = src.charAt(offset);
-
-        var completionType:CompletionType = switch (prev) {
-            case ".": Field;
-            case "(": Toplevel;//Argument;
-            default: Toplevel;
-        }
-
         var b = NativeStringTools.encode(src.substr(0, offset), "utf-8");
         var bytePos = b.length;
 
+        var completionType = getCompletionType(view, prefix, pos);
         var mode = if (completionType.match(Toplevel)) "@toplevel" else "";
 
         var folder = null;
@@ -154,57 +211,17 @@ class HaxeComplete extends EventListener {
         }
 
         for (arg in build.args) {
-            if (arg != "--no-output")
+            if (arg != "--no-output") {
                 cmd.push(arg);
+            }
         }
 
-        trace("Running completion " + cmd.join(" "));
+        // trace("Running completion " + cmd.join(" "));
 
         var tempFile = saveTempFile(view);
         var result = runHaxe(cmd);
         restoreTempFile(view, tempFile);
-
-        var xml = try {
-            ElementTree.XML(result);
-        } catch (_:Dynamic) {
-            trace("No completion:\n" + result);
-            return null;
-        }
-
-        var result:Array<Tuple2<String,String>> = [];
-
-        switch (completionType) {
-            case Toplevel:
-                for (e in xml.findall("i")) {
-                    var name = e.text;
-                    var kind = e.attrib.get("k", "");
-                    var hint = switch (kind) {
-                        case "local" | "member" | "static" | "enum" | "global":
-                            SignatureHelper.prepareSignature(e.attrib.get("t", null));
-                        default:
-                            "";
-                    }
-                    result.push(Tuple2.make('$name$hint\t$kind', e.text));
-                }
-
-            case Field:
-                for (e in xml.findall("i")) {
-                    var name = e.attrib.get("n", "?");
-                    var kind:FieldCompletionKind = cast e.attrib.get("k", "");
-                    var hint = switch (kind) {
-                        case Var | Method: SignatureHelper.prepareSignature(e.find("t").text);
-                        case Type: "\ttype";
-                        case Package: "\tpackage";
-                    }
-                    result.push(Tuple2.make('$name$hint', name));
-                }
-
-            case Argument:
-                view.show_popup_menu([xml.text], null);
-                return null;
-        }
-
-        return Tuple2.make(result, Sublime.INHIBIT_WORD_COMPLETIONS);
+        return result;
     }
 
     public function getBuild(folder:String):Build {
