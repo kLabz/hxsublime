@@ -5,6 +5,7 @@ HaxeLogInit
 HaxeComplete
 HaxeGotoDefinition
 HaxeHint
+HaxeServerCommands
 
 --next
 -D DEPLOY_DIR=%DEPLOY_DIR%

@@ -3,8 +3,9 @@ import python.NativeStringTools;
 import python.Tuple;
 import python.lib.Shutil;
 import python.lib.os.Path;
-import python.lib.subprocess.Popen;
 import python.lib.xml.etree.ElementTree;
+import sys.FileSystem;
+import sys.io.File;
 
 import sublime.Region;
 import sublime.Sublime;
@@ -29,56 +30,9 @@ enum CompletionType {
     Argument;
 }
 
-class HaxeServer {
-    var proc:Popen;
-    var port:Int;
-
-    public function new() {
-    }
-
-    public function start(port:Int):Void {
-        if (proc != null)
-            stop();
-        this.port = port;
-        proc = new Popen(["haxe", "-v", "--wait", Std.string(port)]);
-    }
-
-    public function stop():Void {
-        if (proc != null) {
-            proc.terminate();
-            proc = null;
-        }
-    }
-
-    public function run(args:Array<String>):String {
-        var sock = new sys.net.Socket();
-        sock.connect(new sys.net.Host("127.0.0.1"), port);
-        for (arg in args) {
-            sock.output.writeString(arg);
-            sock.output.writeByte('\n'.code);
-        }
-        sock.output.writeInt8(0);
-        sock.waitForRead();
-        var buf = new StringBuf();
-        for (line in sock.read().split("\n")) {
-            switch (line.fastCodeAt(0)) {
-                case 0x01: // TODO: print
-                case 0x02: // TODO: show error
-                default:
-                    buf.add(line);
-                    buf.addChar('\n'.code);
-            }
-        }
-        sock.close();
-        return buf.toString();
-    }
-}
-
 class HaxeComplete extends EventListener {
 
     public static var instance(default,null):HaxeComplete;
-
-    var haxeServer:HaxeServer = null;
 
     function new() {
         instance = this;
@@ -225,16 +179,11 @@ class HaxeComplete extends EventListener {
     }
 
     public function getBuild(folder:String):Build {
-        return BuildHelper.parse(sys.io.File.getContent(Path.join(folder, "build.hxml")));
+        return BuildHelper.parse(File.getContent(Path.join(folder, "build.hxml")));
     }
 
     public function runHaxe(args:Array<String>):String {
-        var haxePort = 6000;
-        if (haxeServer == null) {
-            haxeServer = new HaxeServer();
-            haxeServer.start(haxePort);
-        }
-        return haxeServer.run(args);
+        return HaxeServer.instance.runCommand(args);
     }
 
     public function saveTempFile(view:View):String {
@@ -242,13 +191,13 @@ class HaxeComplete extends EventListener {
         var tempFile = currentFile + ".tmp";
         var content = view.substr(new Region(0, view.size()));
         Shutil.copy2(currentFile, tempFile);
-        sys.io.File.saveContent(currentFile, content);
+        File.saveContent(currentFile, content);
         return tempFile;
     }
 
     public function restoreTempFile(view:View, tempFile:String):Void {
         var currentFile = view.file_name();
         Shutil.copy2(tempFile, currentFile);
-        sys.FileSystem.deleteFile(tempFile);
+        FileSystem.deleteFile(tempFile);
     }
 }
