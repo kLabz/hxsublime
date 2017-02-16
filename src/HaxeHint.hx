@@ -6,6 +6,8 @@ import sublime.Edit;
 import sublime.Region;
 import sublime.plugin.TextCommand;
 
+import mdpopups.MdPopups;
+
 using StringTools;
 
 private typedef Args = {input:String};
@@ -16,6 +18,11 @@ class HaxeHint extends TextCommand<Args> {
     override function run(edit:Edit, ?args:KwArgs<Args>) {
         var args = args.typed();
         view.run_command("insert", Lib.anonAsDict({characters: args.input}));
+
+        if (args.input == ")") {
+            return MdPopups.hide_popup(view);
+        }
+
         var pos = view.sel()[0].a + 1;
 
         trace("Showing hint " + args);
@@ -32,7 +39,8 @@ class HaxeHint extends TextCommand<Args> {
         }
 
         trace("Found hint: " + xml.text);
-        view.show_popup(parseHint(view.substr(new Region(0, pos)), xml.text));
+        // view.show_popup(parseHint(view.substr(new Region(0, pos)), xml.text));
+        MdPopups.show_popup(view, parseHint(view.substr(new Region(0, pos)), xml.text), true);
     }
 
     private function parseHint(src:String, hint:String, ?pos:Int = 0):String {
@@ -40,16 +48,28 @@ class HaxeHint extends TextCommand<Args> {
 
         // Get arguments definition
         var args:Array<ArgDef> = extractArgs(hint);
-        trace(args);
 
-        // TODO: get function name
+        // Get function name
         var fxName:String = extractFxName(src);
-        trace(fxName);
 
         // TODO: get current arg position
 
-        // TODO: hint markup
-        return hint;
+        var ret:String = '**Function `$fxName`**\n${parseArgs(args)}';
+        return ret;
+    }
+
+    private function parseArgs(args:Array<ArgDef>):String {
+        var ret = '';
+
+        for (i in 0...args.length - 1) {
+            var arg = args[i];
+            ret += '* `${arg.name}: ${arg.type}`\n';
+        }
+
+        var returnType = args.pop().type;
+        ret += 'Return type: `$returnType`';
+
+        return ret;
     }
 
     private function extractFxName(src:String):String {
@@ -119,6 +139,7 @@ class HaxeHint extends TextCommand<Args> {
     }
     
     private function findArgumentEnd(hint:String, start:Int = 0):Int {
+        // TODO: refacto + handle (Void -> Void)
         var nextArrow:Int = hint.indexOf("->", start);
         var nextOChevron:Int = hint.indexOf("<", start);
         

@@ -1,5 +1,6 @@
 {
     "auto_complete_triggers": [
         {"selector": "source.haxe", "characters": "."}
-    ]
+    ],
+    "mdpopups.use_sublime_highlighter": true
 }

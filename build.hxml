@@ -21,3 +21,4 @@ HaxeServerCommands
 --macro MacroUtils.copy("data/Haxe.sublime-build")
 --macro MacroUtils.copy("data/Haxe.sublime-settings")
 --macro MacroUtils.copy("data/HxSublime.sublime-commands")
+--macro MacroUtils.copy("data/dependencies.json")
