@@ -22,7 +22,8 @@ class HaxeHint extends TextCommand<Args> {
         trace(pos);
         trace(view.sel()[0].a);
 
-        var result = HaxeComplete.instance.getHaxeBuild(view, args.input, pos);
+        var result = HaxeComplete.instance.getHaxeBuild(view, args.input, pos, Argument);
+        trace(result);
 
         var xml = try {
             ElementTree.XML(result);
@@ -94,7 +95,7 @@ class HaxeHint extends TextCommand<Args> {
     private function extractArgs(hint:String):Array<ArgDef> {
         var pos:Int = 0;
         var args:Array<ArgDef> = [];
-        
+
         while (pos != -1) {
             var nextPos:Int = findArgumentEnd(hint, pos);
             

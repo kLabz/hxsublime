@@ -41,7 +41,8 @@ class HaxeComplete extends EventListener {
     override function on_query_completions(view:View, prefix:String, locations:Array<Int>):Tuple2<Array<Tuple2<String,String>>, Int> {
         var pos = locations[0];
         // trace("Prefix: " + prefix);
-        var result = getHaxeBuild(view, prefix, pos);
+        var completionType = getCompletionType(view, prefix, pos);
+        var result = getHaxeBuild(view, prefix, pos); //, completionType);
 
         var xml = try {
             ElementTree.XML(result);
@@ -51,7 +52,6 @@ class HaxeComplete extends EventListener {
         }
 
         var result:Array<Tuple2<String,String>> = [];
-        var completionType = getCompletionType(view, prefix, pos);
 
         switch (completionType) {
             case Toplevel:
@@ -81,7 +81,7 @@ class HaxeComplete extends EventListener {
 
             case Argument:
                 // view.show_popup(xml.text);
-                return Tuple2.make([], Sublime.INHIBIT_WORD_COMPLETIONS);
+                return Tuple2.make([], 0); //, Sublime.INHIBIT_WORD_COMPLETIONS);
         }
 
         return Tuple2.make(result, Sublime.INHIBIT_WORD_COMPLETIONS);
@@ -95,14 +95,15 @@ class HaxeComplete extends EventListener {
 
         return switch (prev) {
             case ".": Field;
-            // case "(": Toplevel; //Argument;
-            case "(": Argument;
-            case ",": Argument;
+            case "(": Field; //Argument;
+            case ",": Field; //Argument;
+            // case "(": Argument;
+            // case ",": Argument;
             default: Toplevel;
         }
     }
 
-    public function getHaxeBuild(view:View, prefix:String, pos:Int):String {
+    public function getHaxeBuild(view:View, prefix:String, pos:Int, ?completionType:CompletionType):String {
         var scopeName = view.scope_name(pos);
         if (scopeName.indexOf("source.haxe") != 0) {
             return null;
@@ -126,7 +127,10 @@ class HaxeComplete extends EventListener {
         var b = NativeStringTools.encode(src.substr(0, offset), "utf-8");
         var bytePos = b.length;
 
-        var completionType = getCompletionType(view, prefix, pos);
+        if (completionType == null) {
+            completionType = getCompletionType(view, prefix, pos);
+        }
+
         var mode = if (completionType.match(Toplevel)) "@toplevel" else "";
 
         var folder = null;
