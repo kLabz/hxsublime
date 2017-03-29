@@ -142,13 +142,8 @@ class HaxeComplete extends EventListener {
             return null;
         }
 
-        var folder = null;
-        for (f in view.window().folders()) {
-            if (fileName.startsWith(f)) {
-                folder = f;
-                break;
-            }
-        }
+        var folder = getBuildFolder(view);
+        if (folder == null) return null;
 
         var cmd = [
             "--cwd", folder,
@@ -189,6 +184,16 @@ class HaxeComplete extends EventListener {
         restoreTempFile(view, tempFile);
 
         return result;
+    }
+
+    public function getBuildFolder(view:View):String {
+        for (folder in view.window().folders()) {
+            if (FileSystem.exists(Path.join(folder, "build.hxml"))) {
+                return folder;
+            }
+        }
+
+        return null;
     }
 
     public function getBuild(folder:String):Build {
