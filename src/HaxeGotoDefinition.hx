@@ -19,52 +19,8 @@ class HaxeGotoDefinition extends TextCommand<Dynamic> {
 
         var word = view.word(view.sel()[0]);
         var content = view.substr(new Region(0, word.b));
-        var offset = Codecs.encode(content, "utf-8").length + 1;
-
-        var context = HaxeComplete.instance;
-
-        var folder = null;
-        for (f in view.window().folders()) {
-            if (fileName.startsWith(f)) {
-                folder = f;
-                break;
-            }
-        }
-
-        var build = context.getBuild(folder);
-        var cmd = [
-            "--cwd", folder,
-            "--no-output",
-            "--display",
-            '$fileName@$offset@position'
-        ];
-
-        cmd.push("-" + build.target);
-        cmd.push(build.output);
-
-        for (cp in build.classPaths) {
-            cmd.push("-cp");
-            cmd.push(cp);
-        }
-
-        for (lib in build.libs) {
-            cmd.push("-lib");
-            cmd.push(lib);
-        }
-
-        if (build.main != null) {
-            cmd.push("-main");
-            cmd.push(build.main);
-        }
-
-        for (arg in build.args) {
-            if (arg != "--no-output")
-                cmd.push(arg);
-        }
-
-        var tempFile = context.saveTempFile(view);
-        var result = context.runHaxe(cmd);
-        context.restoreTempFile(view, tempFile);
+        var offset = Codecs.encode(content, "utf-8").length;
+        var result = HaxeComplete.instance.build(view, '$fileName@$offset@position');
 
         var xml = try {
             ElementTree.XML(result);
@@ -82,8 +38,6 @@ class HaxeGotoDefinition extends TextCommand<Dynamic> {
             trace("Invalid position info: " + pos.text);
             return;
         }
-
-        trace(pos.text);
 
         var path = Utils.convertPath(re.matched(1));
         var line = Std.parseInt(re.matched(2));

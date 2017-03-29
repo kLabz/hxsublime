@@ -133,6 +133,15 @@ class HaxeComplete extends EventListener {
 
         var mode = if (completionType.match(Toplevel)) "@toplevel" else "";
 
+        return build(view, '$fileName@$bytePos$mode');
+    }
+
+    public function build(view:View, display:String):String {
+        var fileName = view.file_name();
+        if (fileName == null) {
+            return null;
+        }
+
         var folder = null;
         for (f in view.window().folders()) {
             if (fileName.startsWith(f)) {
@@ -145,7 +154,8 @@ class HaxeComplete extends EventListener {
             "--cwd", folder,
             "--no-output",
             "-D", "display-details",
-            "--display", '$fileName@$bytePos$mode'
+            "--display",
+            display
         ];
 
         var build = getBuild(folder);
@@ -174,11 +184,10 @@ class HaxeComplete extends EventListener {
             }
         }
 
-        // trace("Running completion " + cmd.join(" "));
-
         var tempFile = saveTempFile(view);
         var result = runHaxe(cmd);
         restoreTempFile(view, tempFile);
+
         return result;
     }
 
