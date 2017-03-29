@@ -68,7 +68,6 @@ class HaxeGotoDefinition extends TextCommand<Dynamic> {
 
         view.sel().clear();
         view.sel().add(new Region(point));
-        view.show_at_center(point);
-
+        Sublime.set_timeout(view.show_at_center.bind(point), 10);
     }
 }
