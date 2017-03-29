@@ -19,6 +19,9 @@ extern class View {
     function text_point(row:Int, col:Int):Int;
     function show_at_center(point:Int):Void;
 
+    @:overload(function(region:Region):Int {})
+    function line(point:Int):Int;
+
     @:overload(function(region:Region):Region {})
     function full_line(point:Int):Region;
 

@@ -1,8 +1,20 @@
+import python.Bytes;
+import python.Syntax;
+import python.lib.Codecs;
 import python.lib.Os;
 import python.lib.os.Path;
 
-class Utils {
+import sublime.Region;
+import sublime.Sublime;
+import sublime.View;
 
+typedef PositionInfos = {
+    path:String,
+    line:Int,
+    start:Int
+}
+
+class Utils {
     /**
         Convert normalized path returned by Haxe to the OS path.
     **/
@@ -15,5 +27,53 @@ class Utils {
             }
         }
         return path;
+    }
+
+    public static function extractPosition(text:String):PositionInfos {
+        var re = ~/^(.*):(\d+): (lines|characters) (\d+)-\d+$/;
+        if (!re.match(text)) {
+            // trace("Invalid position info: " + text);
+            return null;
+        }
+
+        var path = Utils.convertPath(re.matched(1));
+        var line = Std.parseInt(re.matched(2));
+        var mode = re.matched(3);
+        var start = (mode == "lines") ? 0 : Std.parseInt(re.matched(4));
+
+        return {
+            path: path,
+            line: line,
+            start: start
+        }
+    }
+
+    public static function displayPosition(posInfos:PositionInfos):Void {
+        if (posInfos == null) return;
+
+        var window = Sublime.active_window();
+        var view = window.open_file(posInfos.path);
+        gotoPosition(view, posInfos.line, posInfos.start);
+    }
+
+
+    static function gotoPosition(view:View, line:Int, start:Int):Void {
+        if (view.is_loading()) {
+            Sublime.set_timeout(gotoPosition.bind(view, line, start), 10);
+            return;
+        }
+
+        var point = view.text_point(line - 1, 0);
+
+        if (start > 0) {
+            var lineString = view.substr(view.full_line(point));
+            var src:Bytes = Syntax.arrayAccess(Codecs.encode(lineString, "utf-8"), 0, start);
+            var col = Codecs.decode(src, "utf-8").length;
+            point = view.text_point(line - 1, col);
+        }
+
+        view.sel().clear();
+        view.sel().add(new Region(point));
+        Sublime.set_timeout(view.show_at_center.bind(point), 10);
     }
 }

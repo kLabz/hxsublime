@@ -3,5 +3,10 @@
         "id": "haxe-goto-definition",
         "caption": "Goto definition (Haxe)",
         "command": "haxe_goto_definition"
+    },
+    {
+        "id": "haxe-find-usage",
+        "caption": "Find usage (Haxe)",
+        "command": "haxe_find_usage"
     }
 ]

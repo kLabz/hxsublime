@@ -3,6 +3,7 @@
 -python %DEPLOY_DIR%/HxSublime.py
 HaxeLogInit
 HaxeComplete
+HaxeFindUsage
 HaxeGotoDefinition
 HaxeHint
 HaxeServerCommands

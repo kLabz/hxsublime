@@ -1,3 +1,12 @@
+import python.NativeStringTools;
+import python.lib.Shutil;
+import python.lib.os.Path;
+import sys.FileSystem;
+import sys.io.File;
+
+import sublime.View;
+import sublime.Region;
+
 using StringTools;
 
 @:enum abstract Target(String) {
@@ -20,6 +29,12 @@ typedef Build = {
     classPaths:Array<String>,
     libs:Array<String>,
     args:Array<String>,
+}
+
+enum CompletionType {
+    Toplevel;
+    Field;
+    Argument;
 }
 
 enum HxmlLine {
@@ -121,5 +136,88 @@ class BuildHelper {
             build.output = "__none__";
 
         return build;
+    }
+
+    public static function build(view:View, display:String):String {
+        var fileName = view.file_name();
+        if (fileName == null) {
+            return null;
+        }
+
+        var folder = getBuildFolder(view);
+        if (folder == null) return null;
+
+        var cmd = [
+            "--cwd", folder,
+            "--no-output",
+            "-D", "display-details",
+            "--display",
+            display
+        ];
+
+        var build = getBuild(folder);
+
+        cmd.push("-" + build.target);
+        cmd.push(build.output);
+
+        for (cp in build.classPaths) {
+            cmd.push("-cp");
+            cmd.push(cp);
+        }
+
+        for (lib in build.libs) {
+            cmd.push("-lib");
+            cmd.push(lib);
+        }
+
+        if (build.main != null) {
+            cmd.push("-main");
+            cmd.push(build.main);
+        }
+
+        for (arg in build.args) {
+            if (arg != "--no-output") {
+                cmd.push(arg);
+            }
+        }
+
+        var tempFile = saveTempFile(view);
+        var result = runHaxe(cmd);
+        restoreTempFile(view, tempFile);
+
+        return result;
+    }
+
+    public static function getBuildFolder(view:View):String {
+        for (folder in view.window().folders()) {
+            if (FileSystem.exists(Path.join(folder, "build.hxml"))) {
+                return folder;
+            }
+        }
+
+        return null;
+    }
+
+    public static function getBuild(folder:String):Build {
+        return BuildHelper.parse(File.getContent(Path.join(folder, "build.hxml")));
+    }
+
+    public static function runHaxe(args:Array<String>):String {
+        return HaxeServer.instance.runCommand(args);
+    }
+
+    public static function saveTempFile(view:View):String {
+        var currentFile = view.file_name();
+        var tempFile = currentFile + ".tmp";
+        var content = view.substr(new Region(0, view.size()));
+        Shutil.copy2(currentFile, tempFile);
+        File.saveContent(currentFile, content);
+        return tempFile;
+    }
+
+    public static function restoreTempFile(view:View, tempFile:String):Void {
+        var currentFile = view.file_name();
+        Shutil.copy2(tempFile, currentFile);
+        FileSystem.deleteFile(tempFile);
     }
 }

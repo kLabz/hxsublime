@@ -14,6 +14,7 @@ import sublime.def.Exec;
 import sublime.plugin.EventListener;
 
 import BuildHelper.Build;
+import BuildHelper.CompletionType;
 
 using StringTools;
 
@@ -22,12 +23,6 @@ using StringTools;
     var Method = "method";
     var Type = "type";
     var Package = "package";
-}
-
-enum CompletionType {
-    Toplevel;
-    Field;
-    Argument;
 }
 
 class HaxeComplete extends EventListener {
@@ -87,22 +82,6 @@ class HaxeComplete extends EventListener {
         return Tuple2.make(result, Sublime.INHIBIT_WORD_COMPLETIONS);
     }
 
-    public function getCompletionType(view:View, prefix:String, pos:Int):CompletionType {
-        var offset = pos - prefix.length;
-        var src = view.substr(new Region(0, view.size()));
-        var prev = src.charAt(offset - 1);
-        // var cur = src.charAt(offset);
-
-        return switch (prev) {
-            case ".": Field;
-            case "(": Field; //Argument;
-            case ",": Field; //Argument;
-            // case "(": Argument;
-            // case ",": Argument;
-            default: Toplevel;
-        }
-    }
-
     public function getHaxeBuild(view:View, prefix:String, pos:Int, ?completionType:CompletionType):String {
         var scopeName = view.scope_name(pos);
         if (scopeName.indexOf("source.haxe") != 0) {
@@ -133,89 +112,23 @@ class HaxeComplete extends EventListener {
 
         var mode = if (completionType.match(Toplevel)) "@toplevel" else "";
 
-        return build(view, '$fileName@$bytePos$mode');
+        return BuildHelper.build(view, '$fileName@$bytePos$mode');
     }
 
-    public function build(view:View, display:String):String {
-        var fileName = view.file_name();
-        if (fileName == null) {
-            return null;
+    public function getCompletionType(view:View, prefix:String, pos:Int):CompletionType {
+        var offset = pos - prefix.length;
+        var src = view.substr(new Region(0, view.size()));
+        var prev = src.charAt(offset - 1);
+        // var cur = src.charAt(offset);
+
+        return switch (prev) {
+            case ".": Field;
+            case "(": Field; //Argument;
+            case ",": Field; //Argument;
+            // case "(": Argument;
+            // case ",": Argument;
+            default: Toplevel;
         }
-
-        var folder = getBuildFolder(view);
-        if (folder == null) return null;
-
-        var cmd = [
-            "--cwd", folder,
-            "--no-output",
-            "-D", "display-details",
-            "--display",
-            display
-        ];
-
-        var build = getBuild(folder);
-
-        cmd.push("-" + build.target);
-        cmd.push(build.output);
-
-        for (cp in build.classPaths) {
-            cmd.push("-cp");
-            cmd.push(cp);
-        }
-
-        for (lib in build.libs) {
-            cmd.push("-lib");
-            cmd.push(lib);
-        }
-
-        if (build.main != null) {
-            cmd.push("-main");
-            cmd.push(build.main);
-        }
-
-        for (arg in build.args) {
-            if (arg != "--no-output") {
-                cmd.push(arg);
-            }
-        }
-
-        var tempFile = saveTempFile(view);
-        var result = runHaxe(cmd);
-        restoreTempFile(view, tempFile);
-
-        return result;
     }
 
-    public function getBuildFolder(view:View):String {
-        for (folder in view.window().folders()) {
-            if (FileSystem.exists(Path.join(folder, "build.hxml"))) {
-                return folder;
-            }
-        }
-
-        return null;
-    }
-
-    public function getBuild(folder:String):Build {
-        return BuildHelper.parse(File.getContent(Path.join(folder, "build.hxml")));
-    }
-
-    public function runHaxe(args:Array<String>):String {
-        return HaxeServer.instance.runCommand(args);
-    }
-
-    public function saveTempFile(view:View):String {
-        var currentFile = view.file_name();
-        var tempFile = currentFile + ".tmp";
-        var content = view.substr(new Region(0, view.size()));
-        Shutil.copy2(currentFile, tempFile);
-        File.saveContent(currentFile, content);
-        return tempFile;
-    }
-
-    public function restoreTempFile(view:View, tempFile:String):Void {
-        var currentFile = view.file_name();
-        Shutil.copy2(tempFile, currentFile);
-        FileSystem.deleteFile(tempFile);
-    }
 }
