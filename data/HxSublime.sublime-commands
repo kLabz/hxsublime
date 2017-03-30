@@ -15,6 +15,10 @@
         "command": "haxe_find_usage"
     },
     {
+        "caption": "HxSublime: Display Hint",
+        "command": "haxe_hint"
+    },
+    {
         "caption": "HxSublime: Restart server",
         "command": "haxe_server_commands",
         "args": {

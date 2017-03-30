@@ -27,6 +27,7 @@ extern class View {
     function full_line(point:Int):Region;
 
     function rowcol(point:Int):Tuple2<Int, Int>;
+    function erase(edit:Edit, region:Region):Void;
 
     function set_scratch(value:Bool):Void;
     function set_read_only(value:Bool):Void;

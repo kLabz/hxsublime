@@ -58,5 +58,31 @@
                 "operand": 1
             }
         ]
+    },
+    {
+        "keys": [")"],
+        "command": "haxe_hint",
+        "args": {"input": ")"},
+        "context": [
+            {
+                "key": "selector",
+                "operator": "equal",
+                "operand": "source.haxe"
+            },
+            {
+                "key": "selector",
+                "operator": "not_equal",
+                "operand": "string,comment"
+            },
+            {
+                "key": "num_selections",
+                "operator": "equal",
+                "operand": 1
+            }
+        ]
+    },
+    {
+        "keys": ["ctrl+space"],
+        "command": "haxe_complete"
     }
 ]

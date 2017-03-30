@@ -4,6 +4,7 @@ import python.lib.xml.etree.ElementTree;
 
 import sublime.Edit;
 import sublime.Region;
+import sublime.View;
 import sublime.plugin.TextCommand;
 
 using StringTools;
@@ -15,25 +16,22 @@ class HaxeHint extends TextCommand<Args> {
 
     override function run(edit:Edit, ?args:KwArgs<Args>) {
         var args = args.typed();
-        view.run_command("insert", Lib.anonAsDict({characters: args.input}));
+        var input = args.input;
+        if (input == ',') input += ' ';
+        view.run_command("insert", Lib.anonAsDict({characters: input}));
+        if (input == ')') return hideHint(view);
+
         var pos = view.sel()[0].a + 1;
-
-        trace("Showing hint " + args);
-        trace(pos);
-        trace(view.sel()[0].a);
-
-        var result = HaxeComplete.instance.getHaxeBuild(view, args.input, pos, Argument);
-        trace(result);
+        var result = HaxeComplete.instance.getHaxeBuild(view, '(', pos, Argument);
 
         var xml = try {
             ElementTree.XML(result);
         } catch (_:Dynamic) {
-            trace("No hint:\n" + result);
             return;
         }
 
         trace("Found hint: " + xml.text);
-        view.show_popup(parseHint(view.substr(new Region(0, pos)), xml.text));
+        displayHint(view, edit, parseHint(view.substr(new Region(0, pos)), xml.text));
     }
 
     private function parseHint(src:String, hint:String, ?pos:Int = 0):String {
@@ -45,11 +43,13 @@ class HaxeHint extends TextCommand<Args> {
 
         // TODO: get function name
         var fxName:String = extractFxName(src);
+        if (fxName == null) return null;
         trace(fxName);
 
         // TODO: get current arg position
 
         // TODO: hint markup
+        trace(hint);
         return hint;
     }
 
@@ -89,7 +89,8 @@ class HaxeHint extends TextCommand<Args> {
             return fxReg.matched(1).trim();
         }
             
-        return "Unknown function";
+        // return "Unknown function";
+        return null;
     }
 
     private function extractArgs(hint:String):Array<ArgDef> {
@@ -160,6 +161,23 @@ class HaxeHint extends TextCommand<Args> {
                 type: argStr.trim()
             }
         }
+    }
+
+    private function hideHint(view:View):Void {
+        var window = view.window();
+        window.run_command("hide_panel", Lib.anonAsDict({"panel": "output.exec"}));
+    }
+
+    private function displayHint(view:View, edit:Edit, hint:String):Void {
+        if (hint == null) return hideHint(view);
+
+        var window = view.window();
+        var outputPanel:View = untyped window.find_output_panel("exec");
+
+        outputPanel.erase(edit,  new Region(0, outputPanel.size()));
+        outputPanel.run_command("append", Lib.anonAsDict({"characters": hint}));
+
+        window.run_command("show_panel", Lib.anonAsDict({"panel": "output.exec"}));
     }
 
 }
