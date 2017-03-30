@@ -83,6 +83,6 @@
     },
     {
         "keys": ["ctrl+space"],
-        "command": "haxe_complete"
+        "command": "auto_complete"
     }
 ]

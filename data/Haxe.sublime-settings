@@ -1,4 +1,6 @@
 {
+    "auto_complete": true,
+    "auto_complete_cycle": true,
     "auto_complete_triggers": [
         {"selector": "source.haxe", "characters": "."}
     ]
