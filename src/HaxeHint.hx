@@ -31,7 +31,7 @@ class HaxeHint extends TextCommand<Args> {
         }
 
         trace("Found hint: " + xml.text);
-        displayHint(view, edit, parseHint(view.substr(new Region(0, pos)), xml.text));
+        displayHint(view, edit, parseHint(view.substr(new Region(0, pos)), xml.text, pos));
     }
 
     private function parseHint(src:String, hint:String, ?pos:Int = 0):String {
@@ -39,20 +39,28 @@ class HaxeHint extends TextCommand<Args> {
 
         // Get arguments definition
         var args:Array<ArgDef> = extractArgs(hint);
-        trace(args);
+        var ret:ArgDef = args.pop();
 
-        // TODO: get function name
+        // Get function name
+        // TODO: get current arg position
+        var currentArg = 0;
         var fxName:String = extractFxName(src);
         if (fxName == null) return null;
-        trace(fxName);
-
-        // TODO: get current arg position
 
         // TODO: hint markup
-        trace(hint);
-        return hint;
+        return [
+            'Function $fxName', 
+            Lambda.mapi(args, function (i, arg) {
+                var ret = '';
+                if (i == currentArg) ret += ' > ';
+                ret += 'Argument #$i: ${arg.name} of type ${arg.type}';
+                return ret;
+            }).join('\n'), 
+            'Return type: ${ret.type}'
+        ].join('\n');
     }
 
+    // TODO: fix + extract current arg position
     private function extractFxName(src:String):String {
         var nParens = 0;
         
@@ -82,15 +90,18 @@ class HaxeHint extends TextCommand<Args> {
                 
         }
         
-        src = src.substr(0, lastOParen + 1).replace("\n", " ");
-        var fxReg = ~/([a-zA-Z0-9<>\s_]+)\($/;
-        
-        if (fxReg.match(src)) {
-            return fxReg.matched(1).trim();
+        var fxArgsReg = ~/\(([^,]+,)*$/;
+        var fxArgsSrc = src.substr(lastOParen, src.length);
+        trace(fxArgsSrc);
+        // TODO
+
+        var fxNameReg = ~/([a-zA-Z0-9<>_]+)\($/;
+        var fxNameSrc = src.substr(0, lastOParen + 1).replace("\n", " ");
+        if (fxNameReg.match(fxNameSrc)) {
+            return fxNameReg.matched(1).trim();
         }
             
-        // return "Unknown function";
-        return null;
+        return "Unknown function";
     }
 
     private function extractArgs(hint:String):Array<ArgDef> {
