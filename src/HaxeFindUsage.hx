@@ -33,7 +33,7 @@ class HaxeFindUsage extends TextCommand<Dynamic> {
         }
 
         var pos = xml.findall("pos");
-        if (pos == null) return;
+        if (pos == null || pos.length == 0) return;
 
         var positions = pos.map(function (el) return el.text);
         
@@ -48,8 +48,9 @@ class HaxeFindUsage extends TextCommand<Dynamic> {
             'Select this item to go back'
         ]);
 
+        var pos = view.rowcol(sel.begin());
         var callback = gotoPosition.bind(
-            {path: fileName, line: view.line(sel), start: sel.b},
+            {path: fileName, line: pos[0] + 1, start: pos[1]},
             positions
         );
 

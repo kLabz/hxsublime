@@ -1,6 +1,7 @@
 package sublime;
 
 import python.Dict;
+import python.Tuple;
 
 @:pythonImport("sublime", "View")
 extern class View {
@@ -24,6 +25,8 @@ extern class View {
 
     @:overload(function(region:Region):Region {})
     function full_line(point:Int):Region;
+
+    function rowcol(point:Int):Tuple2<Int, Int>;
 
     function set_scratch(value:Bool):Void;
     function set_read_only(value:Bool):Void;
