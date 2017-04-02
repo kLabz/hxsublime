@@ -13,7 +13,8 @@
 			},
 			"file_regex": "^\\s*(.+):(\\d+): (?:lines \\d+-\\d+|character(?:s \\d+-| )(\\d+)) : (.*)$",
 			"name": "Compile plugin",
-			"working_dir": "/git/hxsublime/"
+			"working_dir": "/git/hxsublime/",
+			"syntax": "Packages/HxSublime/HaxeBuild.tmLanguage"
 		}
 	],
 	"folders":

@@ -1,0 +1,41 @@
+{
+    "name": "HaxeBuild",
+    "scopeName": "source.haxe",
+    "uuid": "ef73f5d0-303d-11e4-8c21-0800200c9a67",
+    "fileTypes": ["hx"],
+    "patterns": [
+        {
+            "match": "^(\\/usr\\/lib\\/haxe\\/std\\/|\\/?)(src\\/|[a-zA-Z0-9\\._-]+\\/|)+(?>([a-zA-Z0-9\\.]+)\\.hx|--(macro)):([0-9]+):\\s+(characters?\\s+[0-9]+(?>-[0-9]+|))\\s+:\\s+(Called\\sfrom|)(.*)$",
+            "captures": {
+                "1": {"name": "markup.untracked.git_gutter"},
+                "2": {"name": "variable.parameter.haxe"},
+                "3": {"name": "markdown.heading"},
+                "4": {"name": "markdown.heading"},
+                "5": {"name": "markdown.heading"},
+                "6": {"name": "variable.parameter.haxe"},
+                "7": {"name": "keyword.other.haxe"},
+                "8": {"name": "markup.changed"}
+            }
+        },
+        {
+            "match": "^(\\[Finished\\sin\\s([0-9\\.]+)s(\\swith\\sexit\\scode\\s[0-9]+|)\\])$",
+            "captures": {
+                "1": {"name": "markup.untracked.git_gutter"},
+                "2": {"name": "markdown.heading"},
+                "3": {"name": "markup.changed"}
+            }
+        },
+        {
+            "name": "comment.line.double-slash.haxe",
+            "match": "^\\[.*\\]$"
+        },
+        {
+            "name": "markup.changed",
+            "match": "^Aborted$"
+        },
+        {
+            "name": "markup.untracked.git_gutter",
+            "match": "^\\\/usr\\\/lib\\\/haxe\\\/std\\\/$"
+        }
+    ]
+}

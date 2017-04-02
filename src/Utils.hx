@@ -57,7 +57,7 @@ class Utils {
     }
 
 
-    static function gotoPosition(view:View, line:Int, start:Int):Void {
+    public static function gotoPosition(view:View, line:Int, start:Int):Void {
         if (view.is_loading()) {
             Sublime.set_timeout(gotoPosition.bind(view, line, start), 10);
             return;

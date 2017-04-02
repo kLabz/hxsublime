@@ -1,0 +1,45 @@
+{
+    "name": "Haxe",
+    "scopeName": "source.haxe",
+    "uuid": "ef73f5d0-303d-11e4-8c21-0800200c9a68",
+    "fileTypes": ["hx"],
+    "patterns": [
+        {
+            "name": "comment.block.haxe",
+            "begin": "/\\*",
+            "end": "\\*/"
+        },
+        {
+            "match": "^(function)\\s+([a-zA-Z0-9_]+)\\($",
+            "captures": {
+                "1": {"name": "storage.type.function.haxe"},
+                "2": {"name": "markdown.heading"},
+                "3": {"name": "variable.parameter.haxe"}
+            }
+        },
+        {
+            "match": "^\\):(.*)$",
+            "captures": {
+                "1": {"name": "markup.changed"}
+            }
+        },
+        {
+            "match": "^\\s{2}(>)\\s(\\??)([a-zA-Z0-9_]+):(.*),?$",
+            "captures": {
+                "0": {"name": "variable.language"},
+                "1": {"name": "markup.changed"},
+                "2": {"name": "markup.changed"},
+                "3": {"name": "variable.parameter.haxe"},
+                "4": {"name": "markdown.heading"}
+            }
+        },
+        {
+            "match": "^\\s{4}(\\??)([a-zA-Z0-9_]+):(.*),?$",
+            "captures": {
+                "1": {"name": "markup.changed"},
+                "2": {"name": "variable.parameter.haxe"},
+                "3": {"name": "storage.type.function.haxe"}
+            }
+        }
+    ]
+}
