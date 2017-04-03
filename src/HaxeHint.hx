@@ -42,17 +42,17 @@ class HaxeHint extends TextCommand<Args> {
             return hideHint(view);
         }
 
-        var typesResult = BuildHelper.build(view, '$fileName@${++bytePos}@toplevel');
+        /*var typesResult = BuildHelper.build(view, '$fileName@${++bytePos}@toplevel');
         var typesXml = try {
             new Fast(Xml.parse(typesResult));
         } catch (_:Dynamic) {
             return hideHint(view);
-        }
+        }*/
 
-        displayHint(view, edit, parseHint(tmpSrc, typesXml.nodes.i, xml.node.type, selPos));
+        displayHint(view, edit, parseHint(tmpSrc, /*typesXml.nodes.i, */xml.node.type, selPos));
     }
 
-    function parseHint(src:String, typesXml:List<Fast>, hint:Fast, ?pos:Int = 0):Hint {
+    function parseHint(src:String, /*typesXml:List<Fast>, */hint:Fast, ?pos:Int = 0):Hint {
         var markup = [];
         var currLine = 0;
 
