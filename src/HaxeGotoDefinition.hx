@@ -9,6 +9,9 @@ import sublime.Sublime;
 import sublime.View;
 import sublime.plugin.TextCommand;
 
+import util.BuildHelper;
+import util.Utils;
+
 using StringTools;
 
 class HaxeGotoDefinition extends TextCommand<Dynamic> {

@@ -7,8 +7,8 @@ import sublime.Sublime;
 import sublime.View;
 import sublime.plugin.EventListener;
 
-import BuildHelper.Build;
-import BuildHelper.CompletionType;
+import util.BuildHelper;
+import util.SignatureHelper;
 
 using StringTools;
 

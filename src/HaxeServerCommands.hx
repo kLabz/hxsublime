@@ -4,6 +4,8 @@ import python.KwArgs;
 import sublime.Edit;
 import sublime.plugin.TextCommand;
 
+import util.HaxeServer;
+
 private typedef Args = {action: ServerAction};
 
 @:enum abstract ServerAction(String) from String to String {

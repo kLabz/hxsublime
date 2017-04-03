@@ -8,6 +8,9 @@ import sublime.Region;
 import sublime.View;
 import sublime.plugin.TextCommand;
 
+import util.BuildHelper;
+import util.Utils;
+
 using StringTools;
 
 private typedef Args = {input:String};

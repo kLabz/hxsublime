@@ -1,3 +1,5 @@
+package util;
+
 import python.NativeStringTools;
 import python.lib.Shutil;
 import python.lib.os.Path;
@@ -9,22 +11,9 @@ import sublime.Region;
 
 using StringTools;
 
-@:enum abstract Target(String) {
-    var Js = "js";
-    var Neko = "neko";
-    var Cpp = "cpp";
-    var Cs = "cs";
-    var Java = "java";
-    var Python = "python";
-    var Swf = "swf";
-    var As3 = "as3";
-    var Xml = "xml";
-    var Php = "php";
-}
-
 typedef Build = {
     main:String,
-    target:Target,
+    target:BuildTarget,
     output:String,
     classPaths:Array<String>,
     libs:Array<String>,
