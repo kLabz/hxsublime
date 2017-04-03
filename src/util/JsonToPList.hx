@@ -1,3 +1,5 @@
+package util;
+
 import haxe.macro.Compiler;
 
 private abstract Content(Array<Xml>) from Array<Xml> to Array<Xml> {

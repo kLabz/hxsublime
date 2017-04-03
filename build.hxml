@@ -11,16 +11,16 @@ HaxeServerCommands
 --next
 -D DEPLOY_DIR=%DEPLOY_DIR%
 
---macro JsonToPList.convert("data/Haxe.tmLanguage.json",  "Haxe.tmLanguage")
---macro JsonToPList.convert("data/HaxeBuild.tmLanguage.json",  "HaxeBuild.tmLanguage")
---macro JsonToPList.convert("data/HaxeHint.tmLanguage.json",  "HaxeHint.tmLanguage")
---macro JsonToPList.convert("data/HXML.tmLanguage.json", "HXML.tmLanguage")
---macro JsonToPList.convert("data/Comments.Haxe.tmPreferences.json", "Comments.Haxe.tmPreferences")
---macro JsonToPList.convert("data/Comments.HXML.tmPreferences.json", "Comments.HXML.tmPreferences")
+--macro util.JsonToPList.convert("data/Haxe.tmLanguage.json",  "Haxe.tmLanguage")
+--macro util.JsonToPList.convert("data/HaxeBuild.tmLanguage.json",  "HaxeBuild.tmLanguage")
+--macro util.JsonToPList.convert("data/HaxeHint.tmLanguage.json",  "HaxeHint.tmLanguage")
+--macro util.JsonToPList.convert("data/HXML.tmLanguage.json", "HXML.tmLanguage")
+--macro util.JsonToPList.convert("data/Comments.Haxe.tmPreferences.json", "Comments.Haxe.tmPreferences")
+--macro util.JsonToPList.convert("data/Comments.HXML.tmPreferences.json", "Comments.HXML.tmPreferences")
 
---macro MacroUtils.copy("data/Context.sublime-menu")
---macro MacroUtils.copy("data/Default (Linux).sublime-keymap")
---macro MacroUtils.copy("data/Default (Windows).sublime-keymap")
---macro MacroUtils.copy("data/Haxe.sublime-build")
---macro MacroUtils.copy("data/Haxe.sublime-settings")
---macro MacroUtils.copy("data/HxSublime.sublime-commands")
+--macro util.MacroUtils.copy("data/Context.sublime-menu")
+--macro util.MacroUtils.copy("data/Default (Linux).sublime-keymap")
+--macro util.MacroUtils.copy("data/Default (Windows).sublime-keymap")
+--macro util.MacroUtils.copy("data/Haxe.sublime-build")
+--macro util.MacroUtils.copy("data/Haxe.sublime-settings")
+--macro util.MacroUtils.copy("data/HxSublime.sublime-commands")

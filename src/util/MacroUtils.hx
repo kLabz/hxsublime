@@ -1,3 +1,5 @@
+package util;
+
 import haxe.macro.Compiler;
 import haxe.io.Path;
 import sys.io.File;
