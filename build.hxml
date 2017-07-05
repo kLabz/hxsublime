@@ -13,6 +13,7 @@ HaxeServerCommands
 
 --macro util.JsonToPList.convert("data/Haxe.tmLanguage.json",  "Haxe.tmLanguage")
 --macro util.JsonToPList.convert("data/HaxeBuild.tmLanguage.json",  "HaxeBuild.tmLanguage")
+--macro util.JsonToPList.convert("data/HaxeCheckStyle.tmLanguage.json",  "HaxeCheckStyle.tmLanguage")
 --macro util.JsonToPList.convert("data/HaxeHint.tmLanguage.json",  "HaxeHint.tmLanguage")
 --macro util.JsonToPList.convert("data/HXML.tmLanguage.json", "HXML.tmLanguage")
 --macro util.JsonToPList.convert("data/Comments.Haxe.tmPreferences.json", "Comments.Haxe.tmPreferences")

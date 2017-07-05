@@ -1,0 +1,45 @@
+{
+    "name": "HaxeCheckStyle",
+    "scopeName": "source.haxe",
+    "uuid": "ef73f5d0-303d-11e4-8c21-0800200c9a67",
+    "fileTypes": ["hx"],
+    "patterns": [
+        {
+            "match": "^\\/usr\\/lib\\/haxe\\/std\\/|\\/?(?>src\\/|[a-zA-Z0-9\\._-]+\\/|)+(?>([a-zA-Z0-9\\.]+)\\.hx|--(?>macro)):[0-9]+:\\s+(?>character|line)s?\\s+[0-9]+(?>-[0-9]+|)\\s+:\\s+Info:(.*)$",
+            "captures": {
+                "0": {"name": "entity.name.class.haxe"},
+                "2": {"name": "variable.parameter.haxe"}
+            }
+        },
+        {
+            "match": "^\\/usr\\/lib\\/haxe\\/std\\/|\\/?(?>src\\/|[a-zA-Z0-9\\._-]+\\/|)+(?>([a-zA-Z0-9\\.]+)\\.hx|--(?>macro)):[0-9]+:\\s+(?>character|line)s?\\s+[0-9]+(?>-[0-9]+|)\\s+:\\s+Warning:(.*)$",
+            "captures": {
+                "0": {"name": "entity.name.function.haxe"},
+                "2": {"name": "variable.parameter.haxe"}
+            }
+        },
+        {
+            "match": "^\\/usr\\/lib\\/haxe\\/std\\/|\\/?(?>src\\/|[a-zA-Z0-9\\._-]+\\/|)+(?>([a-zA-Z0-9\\.]+)\\.hx|--(?>macro)):[0-9]+:\\s+(?>character|line)s?\\s+[0-9]+(?>-[0-9]+|)\\s+:\\s+Error:(.*)$",
+            "captures": {
+                "0": {"name": "storage.type.function.haxe"},
+                "2": {"name": "variable.parameter.haxe"}
+            }
+        },
+        {
+            "match": "^(\\[Finished\\sin\\s([0-9\\.]+)s(\\swith\\sexit\\scode\\s[0-9]+|)\\])$",
+            "captures": {
+                "1": {"name": "markup.untracked.git_gutter"},
+                "2": {"name": "markdown.heading"},
+                "3": {"name": "markup.changed"}
+            }
+        },
+        {
+            "match": "^Total Issues: [0-9]+ \\((?>Errors: 0|(Errors: [0-9]+)), (?>Warnings: 0|(Warnings: [0-9]+)), (?>Infos: 0|(Infos: [0-9]+))\\)$",
+            "captures": {
+                "1": {"name": "storage.type.function.haxe"},
+                "2": {"name": "entity.name.function.haxe"},
+                "3": {"name": "entity.name.class.haxe"}
+            }
+        }
+    ]
+}
